@@ -1,41 +1,49 @@
-// https://adventofcode.com/2025/day/1
+mod day_1;
 
-static FILE_INPUT: &'static str = include_str!("../input_1.txt");
+use clap::Parser;
+use log::{Level, LevelFilter, Record};
+use std::io::Write;
 
-static STARTING_POINT: i32 = 50;
+#[derive(Parser)]
+struct Args {
+    #[arg(help = "Day number to run")]
+    day: usize,
+
+    #[arg(long, default_value_t = false)]
+    debug: bool,
+}
+
 fn main() {
-    let file_lines_count = FILE_INPUT.lines().count();
-    println!("Iterating on {file_lines_count} instructions");
+    let args = Args::parse();
+    let day = args.day;
+    let debug_mode = args.debug;
 
-    let mut dial = STARTING_POINT;
-    let mut password = 0;
+    env_logger::Builder::from_default_env()
+        .filter_level(if debug_mode {
+            LevelFilter::Debug
+        } else {
+            LevelFilter::Info
+        })
+        .format(|buf, record: &Record| {
+            // Pad raw level to 5 chars
+            let level_raw = format!("{:<5}", record.level());
+            let level_colored = match record.level() {
+                Level::Error => format!("\x1b[31m{}\x1b[0m", level_raw),
+                Level::Warn => format!("\x1b[33m{}\x1b[0m", level_raw),
+                Level::Info => format!("\x1b[32m{}\x1b[0m", level_raw),
+                Level::Debug => format!("\x1b[34m{}\x1b[0m", level_raw),
+                Level::Trace => format!("\x1b[36m{}\x1b[0m", level_raw),
+            };
 
-    println!("The dial is started at {dial}");
+            // let ts = buf.timestamp_millis();
+            // writeln!(buf, "{} {} {}", ts, level, record.args())
+            writeln!(buf, "[{}] {}", level_colored, record.args())
+        })
+        .init();
 
-    for line in FILE_INPUT.lines() {
-        let direction = line.chars().next().unwrap();
-        let movements: i32 = line[1..].parse().unwrap();
-
-        for _ in 0..movements {
-            if direction == 'L' {
-                dial -= 1;
-            } else if direction == 'R' {
-                dial += 1;
-            }
-
-            if dial > 99 {
-                dial = 0;
-            } else if dial < 0 {
-                dial = 99;
-            }
-
-            // For second question, all 0 passed are counted
-            if dial == 0 {
-                password += 1;
-            }
-        }
-
-        println!("The dial is rotated {direction} {movements} to point at {dial}");
+    match day {
+        1 => day_1::solve(),
+        // 2 => day_2::solve(),
+        _ => log::error!("Unsupported day"),
     }
-    println!("Password: {password}")
 }
