@@ -1,4 +1,5 @@
 mod day_1;
+mod day_2;
 
 use clap::Parser;
 use log::{Level, LevelFilter, Record};
@@ -43,7 +44,7 @@ fn main() {
 
     match day {
         1 => day_1::solve(),
-        // 2 => day_2::solve(),
+        2 => day_2::solve(),
         _ => log::error!("Unsupported day"),
     }
 }
