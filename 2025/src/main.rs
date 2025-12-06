@@ -3,6 +3,7 @@ mod day_2;
 mod day_3;
 mod day_4;
 mod day_5;
+mod day_6;
 
 use clap::Parser;
 use log::{Level, LevelFilter, Record};
@@ -51,6 +52,7 @@ fn main() {
         3 => day_3::solve(),
         4 => day_4::solve(),
         5 => day_5::solve(),
+        6 => day_6::solve(),
         _ => log::error!("Unsupported day"),
     }
 }
